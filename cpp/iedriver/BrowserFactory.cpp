@@ -555,6 +555,9 @@ bool BrowserFactory::IsBrowserProcessInitialized(DWORD process_id) {
 bool BrowserFactory::AttachToBrowserUsingActiveAccessibility
                                     (ProcessWindowInfo* process_window_info,
                                      std::string* error_message) {
+
+  ::Sleep(5000);
+  LOG(TRACE) << "AttachToBrowserUsingActiveAccessibility:Waiting for 5 seconds";
   LOG(TRACE) << "Entering BrowserFactory::AttachToBrowserUsingActiveAccessibility";
 
   clock_t end = clock() + (this->browser_attach_timeout_ / 1000 * CLOCKS_PER_SEC);

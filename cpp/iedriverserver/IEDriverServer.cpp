@@ -324,7 +324,7 @@ int _tmain(int argc, _TCHAR* argv[]) {
                    << whitelist
                    << std::endl;
       } else {
-        std::wcout << L"Only local connections are allowed"
+        std::wcout << L"Check 100 Only local connections are allowed"
                    << std::endl;
       }
     }
