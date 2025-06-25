@@ -84,6 +84,7 @@ class DocumentHost {
   int SetFocusedFrameByElement(IHTMLElement* frame_element);
   void SetFocusedFrameToParent(void);
   bool SetFocusToBrowser(void);
+  bool FocusAndMaximizeWindow(HWND hwndTarget);
 
   bool is_edge_chromium(void) const { return this->is_edge_chromium_; }
   void set_is_edge_chromium(const bool value) { this->is_edge_chromium_ = value; }

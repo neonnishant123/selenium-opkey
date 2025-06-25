@@ -557,6 +557,9 @@ bool BrowserFactory::AttachToBrowserUsingActiveAccessibility
                                      std::string* error_message) {
 
   ::Sleep(5000);
+  this->ignore_process_match_ = true;
+  
+
   LOG(TRACE) << "AttachToBrowserUsingActiveAccessibility:Waiting for 5 seconds";
   LOG(TRACE) << "Entering BrowserFactory::AttachToBrowserUsingActiveAccessibility";
 

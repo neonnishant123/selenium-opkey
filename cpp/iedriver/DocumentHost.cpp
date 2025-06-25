@@ -458,6 +458,9 @@ bool DocumentHost::SetFocusToBrowser() {
                                     IID_IUIAutomation,
                                     reinterpret_cast<void**>(&ui_automation));
     if (SUCCEEDED(hr)) {
+      LOG(TRACE) << "Using FocusAndMaximizeWindow to set window focus";
+      this->FocusAndMaximizeWindow(top_level_window_handle);
+      /*
       LOG(TRACE) << "Using UI Automation to set window focus";
       CComPtr<IUIAutomationElement> parent_window;
       hr = ui_automation->ElementFromHandle(top_level_window_handle,
@@ -478,6 +481,7 @@ bool DocumentHost::SetFocusToBrowser() {
           }
         }
       }
+      */
     }
   }
 
@@ -535,6 +539,41 @@ bool DocumentHost::SetFocusToBrowser() {
   }
   foreground_window = ::GetAncestor(::GetForegroundWindow(), GA_ROOT);
   return foreground_window == top_level_window_handle;
+}
+
+bool DocumentHost::FocusAndMaximizeWindow(HWND hwndTarget) {
+  if (!IsWindow(hwndTarget))
+    return false;
+
+  // If minimized or hidden, restore before maximizing
+  if (IsIconic(hwndTarget) || !IsWindowVisible(hwndTarget)) {
+    ShowWindow(hwndTarget, SW_RESTORE);
+  }
+
+  // Get the current foreground window and thread IDs
+  HWND hwndForeground = GetForegroundWindow();
+  DWORD  foregroundThread = 0;
+  if (hwndForeground)
+    foregroundThread = GetWindowThreadProcessId(hwndForeground, nullptr);
+
+  DWORD thisThread = GetCurrentThreadId();
+
+  // Attach our input queue to the foreground window's thread
+  AttachThreadInput(thisThread, foregroundThread, TRUE);
+
+  // Now we can set our window as foreground
+  SetForegroundWindow(hwndTarget);
+  BringWindowToTop(hwndTarget);
+  SetFocus(hwndTarget);
+
+  // Finally maximize it
+  ShowWindow(hwndTarget, SW_MAXIMIZE);
+
+  // Detach our thread
+  AttachThreadInput(thisThread, foregroundThread, FALSE);
+
+  // Verify we succeeded
+  return (GetForegroundWindow() == hwndTarget);
 }
 
 
