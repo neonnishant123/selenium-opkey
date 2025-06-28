@@ -702,6 +702,7 @@ LRESULT IECommandExecutor::OnQuit(UINT uMsg,
       // wait for the Edge browser completing read/write work
       // the delete usually completes in 1 retries
       ::Sleep(100);
+      /*
       if (BrowserFactory::DeleteDirectory(edge_temp_dir_)) {
         // directory delete failed when some files/folders are locked
         LOG(TRACE) << "Failed to delete Edge temporary user data directory "
@@ -713,7 +714,7 @@ LRESULT IECommandExecutor::OnQuit(UINT uMsg,
         LOG(TRACE) << "Deleted Edge temporary user data directory "
           << LOGWSTRING(edge_temp_dir_) << ".";
         break;
-      }
+      }*/
     }
     this->edge_temp_dir_ = L"";
   }

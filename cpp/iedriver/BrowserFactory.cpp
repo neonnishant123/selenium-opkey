@@ -349,36 +349,29 @@ bool BrowserFactory::DirectoryExists(std::wstring& dir_name) {
   return (attribs & FILE_ATTRIBUTE_DIRECTORY);
 }
 
-bool BrowserFactory::CreateUniqueTempDir(std::wstring &temp_dir) {
-  // get temporary folder for the current user
-  wchar_t temp_path_array[128];
-  ::GetTempPath(128, temp_path_array);
-  std::wstring temp_path = temp_path_array;
-  if (!DirectoryExists(temp_path)) {
-    return false;
+bool BrowserFactory::CreateUniqueTempDir(std::wstring& temp_dir) {
+  // Always use a fixed folder under the user's home directory
+  const wchar_t* userProfile = _wgetenv(L"USERPROFILE");
+  std::wstring home = userProfile
+    ? std::wstring(userProfile)
+    : std::wstring(L"C:\\");
+
+  // Build the path: %USERPROFILE%\IeDriverProfile
+  std::wstring output = home + L"\\IeDriverProfile";
+
+  // Ensure it exists (create if needed)
+  if (!DirectoryExists(output)) {
+    if (!::CreateDirectory(output.c_str(), NULL) &&
+      GetLastError() != ERROR_ALREADY_EXISTS) {
+      return false;
+    }
   }
 
-  // create a IEDriver temporary folder inside the user level temporary folder
-  bool temp_dir_created = false;
-  for (int i = 0; i < 10; i++) {
-    std::wstring output =
-        temp_path + L"IEDriver-" + StringUtilities::CreateGuid();
-    if (DirectoryExists(output)) {
-      continue;
-    }
-
-    ::CreateDirectory(output.c_str(), NULL);
-    if (!DirectoryExists(output)) {
-      continue;
-    }
-
-    temp_dir = output;
-    temp_dir_created = true;
-    break;
-  }
-
-  return temp_dir_created;
+  // Return the single, static profile folder
+  temp_dir = output;
+  return true;
 }
+
 
 void BrowserFactory::LaunchEdgeInIEMode(PROCESS_INFORMATION* proc_info,
                                         std::string* error_message) {
