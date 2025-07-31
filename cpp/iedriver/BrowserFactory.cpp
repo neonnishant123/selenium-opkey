@@ -350,24 +350,22 @@ bool BrowserFactory::DirectoryExists(std::wstring& dir_name) {
 }
 
 bool BrowserFactory::CreateUniqueTempDir(std::wstring& temp_dir) {
-  // Always use a fixed folder under the user's home directory
-  const wchar_t* userProfile = _wgetenv(L"USERPROFILE");
-  std::wstring home = userProfile
-    ? std::wstring(userProfile)
+  wchar_t* buffer = nullptr;
+  size_t length = 0;
+  // _wdupenv_s allocates and sets buffer
+  errno_t err = _wdupenv_s(&buffer, &length, L"USERPROFILE");
+  std::wstring home = (err == 0 && buffer)
+    ? std::wstring(buffer, length)
     : std::wstring(L"C:\\");
+  free(buffer);  // always free the allocated buffer
 
-  // Build the path: %USERPROFILE%\IeDriverProfile
   std::wstring output = home + L"\\IeDriverProfile";
-
-  // Ensure it exists (create if needed)
   if (!DirectoryExists(output)) {
     if (!::CreateDirectory(output.c_str(), NULL) &&
       GetLastError() != ERROR_ALREADY_EXISTS) {
       return false;
     }
   }
-
-  // Return the single, static profile folder
   temp_dir = output;
   return true;
 }
