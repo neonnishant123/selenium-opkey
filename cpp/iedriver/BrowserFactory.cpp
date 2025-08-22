@@ -547,7 +547,7 @@ bool BrowserFactory::AttachToBrowserUsingActiveAccessibility
                                     (ProcessWindowInfo* process_window_info,
                                      std::string* error_message) {
 
-  ::Sleep(5000);
+ // ::Sleep(5000);
   this->ignore_process_match_ = true;
   
 
